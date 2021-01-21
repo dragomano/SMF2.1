@@ -577,7 +577,7 @@ function MLSearch()
 
 		// Since we're nice we also want to default focus on to the search field.
 		addInlineJavaScript('
-	$(\'input[name="search"]\').focus();', true);
+		$(\'input[name="search"]\').focus();', true);
 	}
 
 	$context['linktree'][] = array(

@@ -130,27 +130,27 @@ function ReportToModerator()
 	loadTemplate('ReportToMod');
 
 	addInlineJavaScript('
-	var error_box = $("#error_box");
-	$("#report_comment").keyup(function() {
-		var post_too_long = $("#error_post_too_long");
-		if ($(this).val().length > 254)
-		{
-			if (post_too_long.length == 0)
+		var error_box = $("#error_box");
+		$("#report_comment").keyup(function() {
+			var post_too_long = $("#error_post_too_long");
+			if ($(this).val().length > 254)
 			{
-				error_box.show();
-				if ($.trim(error_box.html()) == \'\')
-					error_box.append("<ul id=\'error_list\'></ul>");
+				if (post_too_long.length == 0)
+				{
+					error_box.show();
+					if ($.trim(error_box.html()) == \'\')
+						error_box.append("<ul id=\'error_list\'></ul>");
 
-				$("#error_list").append("<li id=\'error_post_too_long\' class=\'error\'>" + ' . JavaScriptEscape($txt['post_too_long']) . ' + "</li>");
+					$("#error_list").append("<li id=\'error_post_too_long\' class=\'error\'>" + ' . JavaScriptEscape($txt['post_too_long']) . ' + "</li>");
+				}
 			}
-		}
-		else
-		{
-			post_too_long.remove();
-			if ($("#error_list li").length == 0)
-				error_box.hide();
-		}
-	});', true);
+			else
+			{
+				post_too_long.remove();
+				if ($("#error_list li").length == 0)
+					error_box.hide();
+			}
+		});', true);
 }
 
 /**

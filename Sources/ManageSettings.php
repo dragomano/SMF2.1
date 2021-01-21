@@ -771,28 +771,28 @@ function ModifyAntispamSettings($return_config = false)
 
 	// Thirdly, push some JavaScript for the form to make it work.
 	addInlineJavaScript('
-	var nextrow = ' . (!empty($context['question_answers']) ? max(array_keys($context['question_answers'])) + 1 : 1) . ';
-	$(".qa_link a").click(function() {
-		var id = $(this).parent().attr("id").substring(6);
-		$("#qa_fs_" + id).show();
-		$(this).parent().hide();
-	});
-	$(".qa_fieldset legend a").click(function() {
-		var id = $(this).closest("fieldset").attr("id").substring(6);
-		$("#qa_dt_" + id).show();
-		$(this).closest("fieldset").hide();
-	});
-	$(".qa_add_question a").click(function() {
-		var id = $(this).closest("fieldset").attr("id").substring(6);
-		$(\'<dt><input type="text" name="question[\' + id + \'][\' + nextrow + \']" value="" size="50" class="verification_question"></dt><dd><input type="text" name="answer[\' + id + \'][\' + nextrow + \'][]" value="" size="50" class="verification_answer" / ><div class="qa_add_answer"><a href="javascript:void(0);">[ \' + ' . JavaScriptEscape($txt['setup_verification_add_answer']) . ' + \' ]</a></div></dd>\').insertBefore($(this).parent());
-		nextrow++;
-	});
-	$(".qa_fieldset ").on("click", ".qa_add_answer a", function() {
-		var attr = $(this).closest("dd").find(".verification_answer:last").attr("name");
-		$(\'<input type="text" name="\' + attr + \'" value="" size="50" class="verification_answer">\').insertBefore($(this).closest("div"));
-		return false;
-	});
-	$("#qa_dt_' . strtr($language, array('-utf8' => '')) . ' a").click();', true);
+		var nextrow = ' . (!empty($context['question_answers']) ? max(array_keys($context['question_answers'])) + 1 : 1) . ';
+		$(".qa_link a").click(function() {
+			var id = $(this).parent().attr("id").substring(6);
+			$("#qa_fs_" + id).show();
+			$(this).parent().hide();
+		});
+		$(".qa_fieldset legend a").click(function() {
+			var id = $(this).closest("fieldset").attr("id").substring(6);
+			$("#qa_dt_" + id).show();
+			$(this).closest("fieldset").hide();
+		});
+		$(".qa_add_question a").click(function() {
+			var id = $(this).closest("fieldset").attr("id").substring(6);
+			$(\'<dt><input type="text" name="question[\' + id + \'][\' + nextrow + \']" value="" size="50" class="verification_question"></dt><dd><input type="text" name="answer[\' + id + \'][\' + nextrow + \'][]" value="" size="50" class="verification_answer" / ><div class="qa_add_answer"><a href="javascript:void(0);">[ \' + ' . JavaScriptEscape($txt['setup_verification_add_answer']) . ' + \' ]</a></div></dd>\').insertBefore($(this).parent());
+			nextrow++;
+		});
+		$(".qa_fieldset ").on("click", ".qa_add_answer a", function() {
+			var attr = $(this).closest("dd").find(".verification_answer:last").attr("name");
+			$(\'<input type="text" name="\' + attr + \'" value="" size="50" class="verification_answer">\').insertBefore($(this).closest("div"));
+			return false;
+		});
+		$("#qa_dt_' . strtr($language, array('-utf8' => '')) . ' a").click();', true);
 
 	// Will need the utility functions from here.
 	require_once($sourcedir . '/ManageServer.php');
@@ -2292,14 +2292,14 @@ function ModifyLogSettings($return_config = false)
 		return $config_vars;
 
 	addInlineJavaScript('
-	function togglePruned()
-	{
-		var newval = $("#pruningOptions").prop("checked");
-		$("#' . implode(', #', $prune_toggle) . '").closest("dd").toggle(newval);
-		$("#' . implode(', #', $prune_toggle_dt) . '").closest("dt").toggle(newval);
-	};
-	togglePruned();
-	$("#pruningOptions").click(function() { togglePruned(); });', true);
+		function togglePruned()
+		{
+			var newval = $("#pruningOptions").prop("checked");
+			$("#' . implode(', #', $prune_toggle) . '").closest("dd").toggle(newval);
+			$("#' . implode(', #', $prune_toggle_dt) . '").closest("dt").toggle(newval);
+		};
+		togglePruned();
+		$("#pruningOptions").click(function() { togglePruned(); });', true);
 
 	// We'll need this in a bit.
 	require_once($sourcedir . '/ManageServer.php');

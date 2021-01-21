@@ -617,12 +617,12 @@ function ModifyLanguages()
 
 	// We want to highlight the selected language. Need some Javascript for this.
 	addInlineJavaScript('
-	function highlightSelected(box)
-	{
-		$("tr.highlight2").removeClass("highlight2");
-		$("#" + box).addClass("highlight2");
-	}
-	highlightSelected("list_language_list_' . ($language == '' ? 'english' : $language) . '");', true);
+		function highlightSelected(box)
+		{
+			$("tr.highlight2").removeClass("highlight2");
+			$("#" + box).addClass("highlight2");
+		}
+		highlightSelected("list_language_list_' . ($language == '' ? 'english' : $language) . '");', true);
 
 	// Display a warning if we cannot edit the default setting.
 	if (!is_writable($boarddir . '/Settings.php'))
@@ -1449,33 +1449,33 @@ function ModifyLanguage()
 			}
 
 			addInlineJavaScript('
-				function add_lang_entry(group) {
-					var key = prompt("' . $txt['languages_enter_key'] . '");
+		function add_lang_entry(group) {
+			var key = prompt("' . $txt['languages_enter_key'] . '");
 
-					if (key !== null) {
-						++entry_num;
+			if (key !== null) {
+				++entry_num;
 
-						var array_regex = /^(.*)(\[[^\[\]]*\])$/
-						var result = array_regex.exec(key);
-						if (result != null) {
-							key = result[1];
-							var subkey = result[2];
-						} else {
-							var subkey = "";
-						}
+				var array_regex = /^(.*)(\[[^\[\]]*\])$/
+				var result = array_regex.exec(key);
+				if (result != null) {
+					key = result[1];
+					var subkey = result[2];
+				} else {
+					var subkey = "";
+				}
 
-						var bracket_regex = /[\[\]]/
-						if (bracket_regex.test(key)) {
-							alert("' . $txt['languages_invalid_key'] . '" + key + subkey);
-							return;
-						}
+				var bracket_regex = /[\[\]]/
+				if (bracket_regex.test(key)) {
+					alert("' . $txt['languages_invalid_key'] . '" + key + subkey);
+					return;
+				}
 
-						$("#language_" + group).append("<dt><span>" + key + subkey + "</span></dt> <dd id=\"entry_" + entry_num + "\"><input id=\"entry_" + entry_num + "_edit\" class=\"entry_toggle\" type=\"checkbox\" name=\"edit[" + key + "]" + subkey + "\" value=\"add\" data-target=\"#entry_" + entry_num + "\" checked> <label for=\"entry_" + entry_num + "_edit\">' . $txt['edit'] . '</label> <input type=\"hidden\" class=\"entry_oldvalue\" name=\"grp[" + key + "]\" value=\"" + group + "\"> <textarea name=\"entry[" + key + "]" + subkey + "\" class=\"entry_textfield\" cols=\"40\" rows=\"1\" style=\"width: 96%; margin-bottom: 2em;\"></textarea></dd>");
-					}
-				};');
+				$("#language_" + group).append("<dt><span>" + key + subkey + "</span></dt> <dd id=\"entry_" + entry_num + "\"><input id=\"entry_" + entry_num + "_edit\" class=\"entry_toggle\" type=\"checkbox\" name=\"edit[" + key + "]" + subkey + "\" value=\"add\" data-target=\"#entry_" + entry_num + "\" checked> <label for=\"entry_" + entry_num + "_edit\">' . $txt['edit'] . '</label> <input type=\"hidden\" class=\"entry_oldvalue\" name=\"grp[" + key + "]\" value=\"" + group + "\"> <textarea name=\"entry[" + key + "]" + subkey + "\" class=\"entry_textfield\" cols=\"40\" rows=\"1\" style=\"width: 96%; margin-bottom: 2em;\"></textarea></dd>");
+			}
+		};');
 
 			addInlineJavaScript('
-				$(".add_lang_entry_button").show();', true);
+		$(".add_lang_entry_button").show();', true);
 		}
 
 		// Warn them if they try to submit more changes than the server can accept in a single request.
@@ -1483,57 +1483,57 @@ function ModifyLanguage()
 		if (!empty($context['file_entries']))
 		{
 			addInlineJavaScript('
-				max_inputs = ' . $context['max_inputs'] . ';
-				num_inputs = 0;
+		max_inputs = ' . $context['max_inputs'] . ';
+		num_inputs = 0;
 
-				$(".entry_textfield").prop("disabled", true);
-				$(".entry_oldvalue").prop("disabled", true);
+		$(".entry_textfield").prop("disabled", true);
+		$(".entry_oldvalue").prop("disabled", true);
 
-				$(".entry_toggle").click(function() {
-					var target_dd = $( $(this).data("target") );
+		$(".entry_toggle").click(function() {
+			var target_dd = $( $(this).data("target") );
 
-					if ($(this).prop("checked") === true && $(this).val() === "edit") {
-						if (++num_inputs <= max_inputs) {
-							target_dd.find(".entry_oldvalue, .entry_textfield").prop("disabled", false);
-						} else {
-							alert("' . sprintf($txt['languages_max_inputs_warning'], $context['max_inputs']) . '");
-							$(this).prop("checked", false);
-						}
-					} else {
-						--num_inputs;
-						target_dd.find(".entry_oldvalue, .entry_textfield").prop("disabled", true);
-					}
+			if ($(this).prop("checked") === true && $(this).val() === "edit") {
+				if (++num_inputs <= max_inputs) {
+					target_dd.find(".entry_oldvalue, .entry_textfield").prop("disabled", false);
+				} else {
+					alert("' . sprintf($txt['languages_max_inputs_warning'], $context['max_inputs']) . '");
+					$(this).prop("checked", false);
+				}
+			} else {
+				--num_inputs;
+				target_dd.find(".entry_oldvalue, .entry_textfield").prop("disabled", true);
+			}
 
-					if (num_inputs > 0) {
-						$("#primary_settings").trigger("reset");
-						$("#primary_settings input").prop("disabled", true);
-					} else {
-						$("#primary_settings input").prop("disabled", false);
-					}
-				});
+			if (num_inputs > 0) {
+				$("#primary_settings").trigger("reset");
+				$("#primary_settings input").prop("disabled", true);
+			} else {
+				$("#primary_settings input").prop("disabled", false);
+			}
+		});
 
-				$("#primary_settings input").change(function() {
-					num_changed = 0;
-					$("#primary_settings input:text").each(function(i, e) {
-						if ($(e).data("orig") != $(e).val())
-							num_changed++;
-					});
-					$("#primary_settings input:checkbox").each(function(i, e) {
-						cur_val = $(e).is(":checked");
-						orig_val = $(e).val == "true";
-						if (cur_val != orig_val)
-							num_changed++;
-					});
+		$("#primary_settings input").change(function() {
+			num_changed = 0;
+			$("#primary_settings input:text").each(function(i, e) {
+				if ($(e).data("orig") != $(e).val())
+					num_changed++;
+			});
+			$("#primary_settings input:checkbox").each(function(i, e) {
+				cur_val = $(e).is(":checked");
+				orig_val = $(e).val == "true";
+				if (cur_val != orig_val)
+					num_changed++;
+			});
 
-					if (num_changed > 0) {
-						$("#entry_fields").fadeOut();
-					} else {
-						$("#entry_fields").fadeIn();
-					}
-				});
-				$("#reset_main").click(function() {
-					$("#entry_fields").fadeIn();
-				});', true);
+			if (num_changed > 0) {
+				$("#entry_fields").fadeOut();
+			} else {
+				$("#entry_fields").fadeIn();
+			}
+		});
+		$("#reset_main").click(function() {
+			$("#entry_fields").fadeIn();
+		});', true);
 		}
 	}
 

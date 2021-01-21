@@ -225,16 +225,16 @@ function ModifyGeneralSettings($return_config = false)
 
 	// Some javascript for SSL
 	addInlineJavaScript('
-$(function()
-{
-	$("#force_ssl").change(function()
-	{
-		var mode = $(this).val() == 1 ? false : true;
-		$("#image_proxy_enabled").prop("disabled", mode);
-		$("#image_proxy_secret").prop("disabled", mode);
-		$("#image_proxy_maxsize").prop("disabled", mode);
-	}).change();
-});', true);
+		$(function()
+		{
+			$("#force_ssl").change(function()
+			{
+				var mode = $(this).val() == 1 ? false : true;
+				$("#image_proxy_enabled").prop("disabled", mode);
+				$("#image_proxy_secret").prop("disabled", mode);
+				$("#image_proxy_maxsize").prop("disabled", mode);
+			}).change();
+		});', true);
 }
 
 /**
@@ -437,10 +437,10 @@ function ModifyDatabaseSettings($return_config = false)
 
 	if (!$smcFunc['db_allow_persistent']())
 		addInlineJavaScript('
-			$(function()
-			{
-				$("#db_persist").prop("disabled", true);
-			});', true);
+		$(function()
+		{
+			$("#db_persist").prop("disabled", true);
+		});', true);
 
 	// Saving settings?
 	if (isset($_REQUEST['save']))
@@ -500,21 +500,21 @@ function ModifyCookieSettings($return_config = false)
 	);
 
 	addInlineJavaScript('
-	function hideGlobalCookies()
-	{
-		var usingLocal = $("#localCookies").prop("checked");
-		$("#setting_globalCookies").closest("dt").toggle(!usingLocal);
-		$("#globalCookies").closest("dd").toggle(!usingLocal);
+		function hideGlobalCookies()
+		{
+			var usingLocal = $("#localCookies").prop("checked");
+			$("#setting_globalCookies").closest("dt").toggle(!usingLocal);
+			$("#globalCookies").closest("dd").toggle(!usingLocal);
 
-		var usingGlobal = !usingLocal && $("#globalCookies").prop("checked");
-		$("#setting_globalCookiesDomain").closest("dt").toggle(usingGlobal);
-		$("#globalCookiesDomain").closest("dd").toggle(usingGlobal);
-	};
-	hideGlobalCookies();
-
-	$("#localCookies, #globalCookies").click(function() {
+			var usingGlobal = !usingLocal && $("#globalCookies").prop("checked");
+			$("#setting_globalCookiesDomain").closest("dt").toggle(usingGlobal);
+			$("#globalCookiesDomain").closest("dd").toggle(usingGlobal);
+		};
 		hideGlobalCookies();
-	});', true);
+
+		$("#localCookies, #globalCookies").click(function() {
+			hideGlobalCookies();
+		});', true);
 
 	if (empty($user_settings['tfa_secret']))
 		addInlineJavaScript('');

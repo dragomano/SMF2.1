@@ -761,18 +761,18 @@ function setupProfileContext($fields)
 
 	// Some spicy JS.
 	addInlineJavaScript('
-	var form_handle = document.forms.creator;
-	createEventListener(form_handle);
-	' . (!empty($context['require_password']) ? '
-	form_handle.addEventListener(\'submit\', function(event)
-	{
-		if (this.oldpasswrd.value == "")
+		var form_handle = document.forms.creator;
+		createEventListener(form_handle);
+		' . (!empty($context['require_password']) ? '
+		form_handle.addEventListener(\'submit\', function(event)
 		{
-			event.preventDefault();
-			alert(' . (JavaScriptEscape($txt['required_security_reasons'])) . ');
-			return false;
-		}
-	}, false);' : ''), true);
+			if (this.oldpasswrd.value == "")
+			{
+				event.preventDefault();
+				alert(' . (JavaScriptEscape($txt['required_security_reasons'])) . ');
+				return false;
+			}
+		}, false);' : ''), true);
 
 	// Any onsubmit javascript?
 	if (!empty($context['profile_onsubmit_javascript']))

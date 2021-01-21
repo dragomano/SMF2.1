@@ -497,11 +497,11 @@ function CalendarPost()
 	loadTimePicker('#event_time_input .time_input', $time_string);
 	loadDatePair('#event_time_input', 'date_input', 'time_input');
 	addInlineJavaScript('
-	$("#allday").click(function(){
-		$("#start_time").attr("disabled", this.checked);
-		$("#end_time").attr("disabled", this.checked);
-		$("#tz").attr("disabled", this.checked);
-	});', true);
+		$("#allday").click(function(){
+			$("#start_time").attr("disabled", this.checked);
+			$("#end_time").attr("disabled", this.checked);
+			$("#tz").attr("disabled", this.checked);
+		});', true);
 }
 
 /**

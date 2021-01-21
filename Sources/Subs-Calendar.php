@@ -750,24 +750,24 @@ function loadDatePicker($selector = 'input.date_input', $date_format = '')
 	loadCSSFile('jquery-ui.datepicker.css', array(), 'smf_datepicker');
 	loadJavaScriptFile('jquery-ui.datepicker.min.js', array('defer' => true), 'smf_datepicker');
 	addInlineJavaScript('
-	$("' . $selector . '").datepicker({
-		dateFormat: "' . $date_format . '",
-		autoSize: true,
-		isRTL: ' . ($context['right_to_left'] ? 'true' : 'false') . ',
-		constrainInput: true,
-		showAnim: "",
-		showButtonPanel: false,
-		yearRange: "' . $modSettings['cal_minyear'] . ':' . $modSettings['cal_maxyear'] . '",
-		hideIfNoPrevNext: true,
-		monthNames: ["' . implode('", "', $txt['months_titles']) . '"],
-		monthNamesShort: ["' . implode('", "', $txt['months_short']) . '"],
-		dayNames: ["' . implode('", "', $txt['days']) . '"],
-		dayNamesShort: ["' . implode('", "', $txt['days_short']) . '"],
-		dayNamesMin: ["' . implode('", "', $txt['days_short']) . '"],
-		prevText: "' . $txt['prev_month'] . '",
-		nextText: "' . $txt['next_month'] . '",
-		firstDay: ' . (!empty($options['calendar_start_day']) ? $options['calendar_start_day'] : 0) . ',
-	});', true);
+		$("' . $selector . '").datepicker({
+			dateFormat: "' . $date_format . '",
+			autoSize: true,
+			isRTL: ' . ($context['right_to_left'] ? 'true' : 'false') . ',
+			constrainInput: true,
+			showAnim: "",
+			showButtonPanel: false,
+			yearRange: "' . $modSettings['cal_minyear'] . ':' . $modSettings['cal_maxyear'] . '",
+			hideIfNoPrevNext: true,
+			monthNames: ["' . implode('", "', $txt['months_titles']) . '"],
+			monthNamesShort: ["' . implode('", "', $txt['months_short']) . '"],
+			dayNames: ["' . implode('", "', $txt['days']) . '"],
+			dayNamesShort: ["' . implode('", "', $txt['days_short']) . '"],
+			dayNamesMin: ["' . implode('", "', $txt['days_short']) . '"],
+			prevText: "' . $txt['prev_month'] . '",
+			nextText: "' . $txt['next_month'] . '",
+			firstDay: ' . (!empty($options['calendar_start_day']) ? $options['calendar_start_day'] : 0) . ',
+		});', true);
 }
 
 /**
@@ -802,11 +802,11 @@ function loadTimePicker($selector = 'input.time_input', $time_format = '')
 	loadCSSFile('jquery.timepicker.css', array(), 'smf_timepicker');
 	loadJavaScriptFile('jquery.timepicker.min.js', array('defer' => true), 'smf_timepicker');
 	addInlineJavaScript('
-	$("' . $selector . '").timepicker({
-		timeFormat: "' . $time_format . '",
-		showDuration: true,
-		maxTime: "23:59:59",
-	});', true);
+		$("' . $selector . '").timepicker({
+			timeFormat: "' . $time_format . '",
+			showDuration: true,
+			maxTime: "23:59:59",
+		});', true);
 }
 
 /**
@@ -875,8 +875,7 @@ function loadDatePair($container, $date_class = '', $time_class = '')
 	}
 
 	addInlineJavaScript('
-	$("' . $container . '").datepair({' . $datepair_options . "\n\t});", true);
-
+		$("' . $container . '").datepair({' . $datepair_options . "\n\t});", true);
 }
 
 /**

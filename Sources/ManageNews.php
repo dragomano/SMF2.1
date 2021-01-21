@@ -1114,7 +1114,7 @@ function ModifyNewsSettings($return_config = false)
 
 	// Add some javascript at the bottom...
 	addInlineJavaScript('
-	document.getElementById("xmlnews_maxlen").disabled = !document.getElementById("xmlnews_enable").checked;', true);
+		document.getElementById("xmlnews_maxlen").disabled = !document.getElementById("xmlnews_enable").checked;', true);
 
 	// Saving the settings?
 	if (isset($_GET['save']))

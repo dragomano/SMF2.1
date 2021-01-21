@@ -171,26 +171,26 @@ function PackageServers()
 	}
 
 	addInlineJavaScript('
-	$(\'.new_package_content\').hide();
-	$(\'.download_new_package\').on(\'click\', function() {
-		var collapseState = $(\'.new_package_content\').css(\'display\');
-		var icon = $(\'.download_new_package\').children(\'span\');
-		var collapsedDiv = $(\'.new_package_content\');
+		$(\'.new_package_content\').hide();
+		$(\'.download_new_package\').on(\'click\', function() {
+			var collapseState = $(\'.new_package_content\').css(\'display\');
+			var icon = $(\'.download_new_package\').children(\'span\');
+			var collapsedDiv = $(\'.new_package_content\');
 
-		if (collapseState == \'none\')
-		{
-			collapsedDiv.show(\'slow\');
-			icon.removeClass(\'toggle_down\').addClass(\'toggle_up\');
-			icon.prop(\'title\', ' . JavaScriptEscape($txt['hide']) . ');
-		}
+			if (collapseState == \'none\')
+			{
+				collapsedDiv.show(\'slow\');
+				icon.removeClass(\'toggle_down\').addClass(\'toggle_up\');
+				icon.prop(\'title\', ' . JavaScriptEscape($txt['hide']) . ');
+			}
 
-		else
-		{
-			collapsedDiv.hide(\'slow\');
-			icon.removeClass(\'toggle_up\').addClass(\'toggle_down\');
-			icon.prop(\'title\', ' . JavaScriptEscape($txt['show']) . ');
-		}
-	});', true);
+			else
+			{
+				collapsedDiv.hide(\'slow\');
+				icon.removeClass(\'toggle_up\').addClass(\'toggle_down\');
+				icon.prop(\'title\', ' . JavaScriptEscape($txt['show']) . ');
+			}
+		});', true);
 }
 
 /**

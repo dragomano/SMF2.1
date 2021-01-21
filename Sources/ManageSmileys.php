@@ -1326,7 +1326,8 @@ function EditSmileys()
 		$context['default_list'] = 'smiley_list';
 		$context['sub_template'] = 'show_list';
 
-		addInlineJavaScript("\n\t" . 'changeSet("' . $modSettings['smiley_sets_default'] . '");', true);
+		addInlineJavaScript('
+		changeSet("' . $modSettings['smiley_sets_default'] . '");', true);
 	}
 	// Modifying smileys.
 	elseif ($context['sub_action'] == 'modifysmiley')

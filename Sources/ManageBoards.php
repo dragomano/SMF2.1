@@ -882,7 +882,7 @@ function EditBoardSettings($return_config = false)
 
 	// Add some javascript stuff for the recycle box.
 	addInlineJavaScript('
-	document.getElementById("recycle_board").disabled = !document.getElementById("recycle_enable").checked;', true);
+		document.getElementById("recycle_board").disabled = !document.getElementById("recycle_enable").checked;', true);
 
 	// Warn the admin against selecting the recycle topic without selecting a board.
 	$context['force_form_onsubmit'] = 'if(document.getElementById(\'recycle_enable\').checked && document.getElementById(\'recycle_board\').value == 0) { return confirm(\'' . $txt['recycle_board_unselected_notice'] . '\');} return true;';

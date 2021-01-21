@@ -376,11 +376,11 @@ function Post($post_errors = array())
 		loadTimePicker('#event_time_input .time_input', $time_string);
 		loadDatePair('#event_time_input', 'date_input', 'time_input');
 		addInlineJavaScript('
-	$("#allday").click(function(){
-		$("#start_time").attr("disabled", this.checked);
-		$("#end_time").attr("disabled", this.checked);
-		$("#tz").attr("disabled", this.checked);
-	});	', true);
+		$("#allday").click(function(){
+			$("#start_time").attr("disabled", this.checked);
+			$("#end_time").attr("disabled", this.checked);
+			$("#tz").attr("disabled", this.checked);
+		});	', true);
 
 		$context['event']['board'] = !empty($board) ? $board : $modSettings['cal_defaultboard'];
 		$context['event']['topic'] = !empty($topic) ? $topic : 0;
@@ -1254,21 +1254,21 @@ function Post($post_errors = array())
 	loadJavaScriptFile('quotedText.js', array('defer' => true, 'minimize' => true), 'smf_quotedText');
 
 	addInlineJavaScript('
-	var current_attachments = [];');
+		var current_attachments = [];');
 
 	if (!empty($context['current_attachments']))
 	{
 		// Mock files to show already attached files.
 		foreach ($context['current_attachments'] as $key => $mock)
 			addInlineJavaScript('
-	current_attachments.push({
-		name: ' . JavaScriptEscape($mock['name']) . ',
-		size: ' . $mock['size'] . ',
-		attachID: ' . $mock['attachID'] . ',
-		approved: ' . $mock['approved'] . ',
-		type: ' . JavaScriptEscape(!empty($mock['mime_type']) ? $mock['mime_type'] : '') . ',
-		thumbID: ' . (!empty($mock['thumb']) ? $mock['thumb'] : 0) . '
-	});');
+		current_attachments.push({
+			name: ' . JavaScriptEscape($mock['name']) . ',
+			size: ' . $mock['size'] . ',
+			attachID: ' . $mock['attachID'] . ',
+			approved: ' . $mock['approved'] . ',
+			type: ' . JavaScriptEscape(!empty($mock['mime_type']) ? $mock['mime_type'] : '') . ',
+			thumbID: ' . (!empty($mock['thumb']) ? $mock['thumb'] : 0) . '
+		});');
 	}
 
 	// File Upload.
@@ -1282,37 +1282,37 @@ function Post($post_errors = array())
 		loadJavaScriptFile('dropzone.min.js', array('defer' => true), 'smf_dropzone');
 		loadJavaScriptFile('smf_fileUpload.js', array('defer' => true, 'minimize' => true), 'smf_fileUpload');
 		addInlineJavaScript('
-	$(function() {
-		smf_fileUpload({
-			dictDefaultMessage : ' . JavaScriptEscape($txt['attach_drop_zone']) . ',
-			dictFallbackMessage : ' . JavaScriptEscape($txt['attach_drop_zone_no']) . ',
-			dictCancelUpload : ' . JavaScriptEscape($txt['modify_cancel']) . ',
-			genericError: ' . JavaScriptEscape($txt['attach_php_error']) . ',
-			text_attachLeft: ' . JavaScriptEscape($txt['attachments_left']) . ',
-			text_deleteAttach: ' . JavaScriptEscape($txt['attached_file_delete']) . ',
-			text_attachDeleted: ' . JavaScriptEscape($txt['attached_file_deleted']) . ',
-			text_insertBBC: ' . JavaScriptEscape($txt['attached_insert_bbc']) . ',
-			text_attachUploaded: ' . JavaScriptEscape($txt['attached_file_uploaded']) . ',
-			text_attach_unlimited: ' . JavaScriptEscape($txt['attach_drop_unlimited']) . ',
-			text_totalMaxSize: ' . JavaScriptEscape($txt['attach_max_total_file_size_current']) . ',
-			text_max_size_progress: ' . JavaScriptEscape($txt['attach_max_size_progress']) . ',
-			dictMaxFilesExceeded: ' . JavaScriptEscape($txt['more_attachments_error']) . ',
-			dictInvalidFileType: ' . JavaScriptEscape(sprintf($txt['cant_upload_type'], $context['allowed_extensions'])) . ',
-			dictFileTooBig: ' . JavaScriptEscape(sprintf($txt['file_too_big'], comma_format($modSettings['attachmentSizeLimit'], 0))) . ',
-			acceptedFiles: ' . JavaScriptEscape($acceptedFiles) . ',
-			thumbnailWidth: ' . (!empty($modSettings['attachmentThumbWidth']) ? $modSettings['attachmentThumbWidth'] : 'null') . ',
-			thumbnailHeight: ' . (!empty($modSettings['attachmentThumbHeight']) ? $modSettings['attachmentThumbHeight'] : 'null') . ',
-			limitMultiFileUploadSize:' . round(max($modSettings['attachmentPostLimit'] - ($context['attachments']['total_size'] / 1024), 0)) * 1024 . ',
-			maxFileAmount: ' . (!empty($context['num_allowed_attachments']) ? $context['num_allowed_attachments'] : 'null') . ',
-			maxTotalSize: ' . (!empty($modSettings['attachmentPostLimit']) ? $modSettings['attachmentPostLimit'] : '0') . ',
-			maxFilesize: ' . (!empty($modSettings['attachmentSizeLimit']) ? $modSettings['attachmentSizeLimit'] : '0') . ',
-		});
-	});', true);
+		$(function() {
+			smf_fileUpload({
+				dictDefaultMessage : ' . JavaScriptEscape($txt['attach_drop_zone']) . ',
+				dictFallbackMessage : ' . JavaScriptEscape($txt['attach_drop_zone_no']) . ',
+				dictCancelUpload : ' . JavaScriptEscape($txt['modify_cancel']) . ',
+				genericError: ' . JavaScriptEscape($txt['attach_php_error']) . ',
+				text_attachLeft: ' . JavaScriptEscape($txt['attachments_left']) . ',
+				text_deleteAttach: ' . JavaScriptEscape($txt['attached_file_delete']) . ',
+				text_attachDeleted: ' . JavaScriptEscape($txt['attached_file_deleted']) . ',
+				text_insertBBC: ' . JavaScriptEscape($txt['attached_insert_bbc']) . ',
+				text_attachUploaded: ' . JavaScriptEscape($txt['attached_file_uploaded']) . ',
+				text_attach_unlimited: ' . JavaScriptEscape($txt['attach_drop_unlimited']) . ',
+				text_totalMaxSize: ' . JavaScriptEscape($txt['attach_max_total_file_size_current']) . ',
+				text_max_size_progress: ' . JavaScriptEscape($txt['attach_max_size_progress']) . ',
+				dictMaxFilesExceeded: ' . JavaScriptEscape($txt['more_attachments_error']) . ',
+				dictInvalidFileType: ' . JavaScriptEscape(sprintf($txt['cant_upload_type'], $context['allowed_extensions'])) . ',
+				dictFileTooBig: ' . JavaScriptEscape(sprintf($txt['file_too_big'], comma_format($modSettings['attachmentSizeLimit'], 0))) . ',
+				acceptedFiles: ' . JavaScriptEscape($acceptedFiles) . ',
+				thumbnailWidth: ' . (!empty($modSettings['attachmentThumbWidth']) ? $modSettings['attachmentThumbWidth'] : 'null') . ',
+				thumbnailHeight: ' . (!empty($modSettings['attachmentThumbHeight']) ? $modSettings['attachmentThumbHeight'] : 'null') . ',
+				limitMultiFileUploadSize:' . round(max($modSettings['attachmentPostLimit'] - ($context['attachments']['total_size'] / 1024), 0)) * 1024 . ',
+				maxFileAmount: ' . (!empty($context['num_allowed_attachments']) ? $context['num_allowed_attachments'] : 'null') . ',
+				maxTotalSize: ' . (!empty($modSettings['attachmentPostLimit']) ? $modSettings['attachmentPostLimit'] : '0') . ',
+				maxFilesize: ' . (!empty($modSettings['attachmentSizeLimit']) ? $modSettings['attachmentSizeLimit'] : '0') . ',
+			});
+		});', true);
 	}
 
 	// Knowing the current board ID might be handy.
 	addInlineJavaScript('
-	var current_board = ' . (empty($context['current_board']) ? 'null' : $context['current_board']) . ';', false);
+		var current_board = ' . (empty($context['current_board']) ? 'null' : $context['current_board']) . ';', false);
 
 	/* Now let's set up the fields for the posting form header...
 

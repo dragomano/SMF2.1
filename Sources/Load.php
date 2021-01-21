@@ -2538,11 +2538,11 @@ function loadTheme($id_theme = 0, $initialize = true)
 		$ts = time();
 		$ts -= $ts % 15;
 		addInlineJavaScript('
-	function triggerCron()
-	{
-		$.get(' . JavaScriptEscape($boardurl) . ' + "/cron.php?ts=' . $ts . '");
-	}
-	window.setTimeout(triggerCron, 1);', true);
+		function triggerCron()
+		{
+			$.get(' . JavaScriptEscape($boardurl) . ' + "/cron.php?ts=' . $ts . '");
+		}
+		window.setTimeout(triggerCron, 1);', true);
 	}
 
 	// Filter out the restricted boards from the linktree

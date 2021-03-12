@@ -8,7 +8,7 @@
  *
  * @package SMF
  * @author Simple Machines https://www.simplemachines.org
- * @copyright 2020 Simple Machines and individual contributors
+ * @copyright 2021 Simple Machines and individual contributors
  * @license https://www.simplemachines.org/about/smf/license.php BSD
  *
  * @version 2.1 RC3
@@ -1565,6 +1565,8 @@ function create_control_richedit($editorOptions)
 
 	// The [#] item code for creating list items causes issues with SCEditor, but [+] is a safe equivalent.
 	$editorOptions['value'] = str_replace('[#]', '[+]', $editorOptions['value']);
+	// Tabs are not shown in the SCEditor, replace with spaces.
+	$editorOptions['value'] = str_replace("\t", '    ', $editorOptions['value']);
 
 	// Start off the editor...
 	$context['controls']['richedit'][$editorOptions['id']] = array(
@@ -1806,7 +1808,7 @@ function create_control_richedit($editorOptions)
 					{
 						$context['bbcodes_handlers'] .= ',
 							exec: function () {
-								this.insert(' . JavaScriptEscape($tag['before']) . (isset($tag['after']) ? ', ' . JavaScriptEscape($tag['after']) : '') . ');
+								this.insertText(' . JavaScriptEscape($tag['before']) . (isset($tag['after']) ? ', ' . JavaScriptEscape($tag['after']) : '') . ');
 							},
 							txtExec: [' . JavaScriptEscape($tag['before']) . (isset($tag['after']) ? ', ' . JavaScriptEscape($tag['after']) : '') . ']';
 					}
@@ -1885,12 +1887,12 @@ function create_control_richedit($editorOptions)
 	$sce_options = array(
 		'width' => isset($editorOptions['width']) ? $editorOptions['width'] : '100%',
 		'height' => isset($editorOptions['height']) ? $editorOptions['height'] : '175px',
-		'style' => $settings[file_exists($settings['theme_dir'] . '/css/jquery.sceditor.default.css') ? 'theme_url' : 'default_theme_url'] . '/css/jquery.sceditor.default.css',
+		'style' => $settings[file_exists($settings['theme_dir'] . '/css/jquery.sceditor.default.css') ? 'theme_url' : 'default_theme_url'] . '/css/jquery.sceditor.default.css' . $context['browser_cache'],
 		'emoticonsCompat' => true,
 		'colors' => 'black,maroon,brown,green,navy,grey,red,orange,teal,blue,white,hotpink,yellow,limegreen,purple',
 		'format' => 'bbcode',
 		'plugins' => '',
-		'bbcodeTrim' => true,
+		'bbcodeTrim' => false,
 	);
 	if (!empty($context['controls']['richedit'][$editorOptions['id']]['locale']))
 		$sce_options['locale'] = $context['controls']['richedit'][$editorOptions['id']]['locale'];
@@ -1938,6 +1940,9 @@ function create_control_richedit($editorOptions)
 	}
 
 	$sce_options['toolbar'] = '';
+	$sce_options['parserOptions']['txtVars'] = [
+		'code' => $txt['code']
+	];
 	if (!empty($modSettings['enableBBC']))
 	{
 		$count_tags = count($context['bbc_tags']);

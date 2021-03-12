@@ -9,7 +9,7 @@
  *
  * @package SMF
  * @author Simple Machines https://www.simplemachines.org
- * @copyright 2020 Simple Machines and individual contributors
+ * @copyright 2021 Simple Machines and individual contributors
  * @license https://www.simplemachines.org/about/smf/license.php BSD
  *
  * @version 2.1 RC3
@@ -176,6 +176,7 @@ function MessageMain()
 	// This is convenient.  Do you know how annoying it is to do this every time?!
 	$context['current_label_redirect'] = 'action=pm;f=' . $context['folder'] . (isset($_GET['start']) ? ';start=' . $_GET['start'] : '') . (isset($_REQUEST['l']) ? ';l=' . $_REQUEST['l'] : '');
 	$context['can_issue_warning'] = allowedTo('issue_warning') && $modSettings['warning_settings'][0] == 1;
+	$context['can_moderate_forum'] = allowedTo('moderate_forum');
 
 	// Are PM drafts enabled?
 	$context['drafts_pm_save'] = !empty($modSettings['drafts_pm_enabled']) && allowedTo('pm_draft');
@@ -317,6 +318,7 @@ function messageIndexBar($area)
 				'amt' => $label['unread_messages'],
 				'unread_messages' => $label['unread_messages'],
 				'messages' => $label['messages'],
+				'icon' => 'folder',
 			);
 		}
 	}
@@ -4155,7 +4157,7 @@ function LoadRules($reload = false)
  */
 function isAccessiblePM($pmID, $validFor = 'in_or_outbox')
 {
-	global $user_info, $smcFunc;
+	global $user_info, $smcFunc, $txt;
 
 	$request = $smcFunc['db_query']('', '
 		SELECT
@@ -4196,7 +4198,8 @@ function isAccessiblePM($pmID, $validFor = 'in_or_outbox')
 			break;
 
 		default:
-			trigger_error('Undefined validation type given', E_USER_ERROR);
+			loadLanguage('Errors');
+			trigger_error($txt['pm_invalid_validation_type'], E_USER_ERROR);
 			break;
 	}
 }

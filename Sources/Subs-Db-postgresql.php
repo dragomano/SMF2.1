@@ -7,7 +7,7 @@
  *
  * @package SMF
  * @author Simple Machines https://www.simplemachines.org
- * @copyright 2020 Simple Machines and individual contributors
+ * @copyright 2021 Simple Machines and individual contributors
  * @license https://www.simplemachines.org/about/smf/license.php BSD
  *
  * @version 2.1 RC3
@@ -645,7 +645,7 @@ function smf_db_error($db_string, $connection = null)
  */
 function smf_db_insert($method, $table, $columns, $data, $keys, $returnmode = 0, $connection = null)
 {
-	global $smcFunc, $db_connection, $db_prefix;
+	global $smcFunc, $db_connection, $db_prefix, $txt;
 
 	$connection = $connection === null ? $db_connection : $connection;
 
@@ -798,7 +798,8 @@ function smf_db_insert($method, $table, $columns, $data, $keys, $returnmode = 0,
 				else
 				{
 					$with_returning = false;
-					trigger_error('trying to returning ID Field which is not a Int field', E_USER_ERROR);
+					loadLanguage('Errors');
+					trigger_error($txt['postgres_id_not_int'], E_USER_ERROR);
 				}
 			}
 		}

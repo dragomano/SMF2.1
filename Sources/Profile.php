@@ -9,7 +9,7 @@
  *
  * @package SMF
  * @author Simple Machines https://www.simplemachines.org
- * @copyright 2020 Simple Machines and individual contributors
+ * @copyright 2021 Simple Machines and individual contributors
  * @license https://www.simplemachines.org/about/smf/license.php BSD
  *
  * @version 2.1 RC3
@@ -222,8 +222,8 @@ function ModifyProfile($post_errors = array())
 					'function' => 'viewWarning',
 					'icon' => 'warning',
 					'permission' => array(
-						'own' => array('profile_warning_own', 'profile_warning_any', 'issue_warning', 'moderate_forum'),
-						'any' => array('profile_warning_any', 'issue_warning', 'moderate_forum'),
+						'own' => array('view_warning_own', 'view_warning_any', 'issue_warning', 'moderate_forum'),
+						'any' => array('view_warning_any', 'issue_warning', 'moderate_forum'),
 					),
 				),
 			),

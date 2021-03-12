@@ -7,7 +7,7 @@
  *
  * @package SMF
  * @author Simple Machines https://www.simplemachines.org
- * @copyright 2020 Simple Machines and individual contributors
+ * @copyright 2021 Simple Machines and individual contributors
  * @license https://www.simplemachines.org/about/smf/license.php BSD
  *
  * @version 2.1 RC3
@@ -139,11 +139,14 @@ function modifyCategory($category_id, $catOptions)
  */
 function createCategory($catOptions)
 {
-	global $smcFunc;
+	global $smcFunc, $txt;
 
 	// Check required values.
 	if (!isset($catOptions['cat_name']) || trim($catOptions['cat_name']) == '')
-		trigger_error('createCategory(): A category name is required', E_USER_ERROR);
+	{
+		loadLanguage('Errors');
+		trigger_error($txt['create_category_no_name'], E_USER_ERROR);
+	}
 
 	// Set default values.
 	if (!isset($catOptions['cat_desc']))
@@ -200,7 +203,7 @@ function createCategory($catOptions)
  */
 function deleteCategories($categories, $moveBoardsTo = null)
 {
-	global $sourcedir, $smcFunc, $cat_tree;
+	global $sourcedir, $smcFunc, $cat_tree, $txt;
 
 	require_once($sourcedir . '/Subs-Boards.php');
 
@@ -230,7 +233,10 @@ function deleteCategories($categories, $moveBoardsTo = null)
 
 	// Make sure the safe category is really safe.
 	elseif (in_array($moveBoardsTo, $categories))
-		trigger_error('deleteCategories(): You cannot move the boards to a category that\'s being deleted', E_USER_ERROR);
+	{
+		loadLanguage('Errors');
+		trigger_error($txt['cannot_move_to_deleted_category'], E_USER_ERROR);
+	}
 
 	// Move the boards inside the categories to a safe category.
 	else

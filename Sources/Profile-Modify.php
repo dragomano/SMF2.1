@@ -9,7 +9,7 @@
  *
  * @package SMF
  * @author Simple Machines https://www.simplemachines.org
- * @copyright 2020 Simple Machines and individual contributors
+ * @copyright 2021 Simple Machines and individual contributors
  * @license https://www.simplemachines.org/about/smf/license.php BSD
  *
  * @version 2.1 RC3
@@ -1312,9 +1312,15 @@ function makeCustomFieldChanges($memID, $area, $sanitize = true, $returnErrors =
 				'action' => 'customfield_' . $row['col_name'],
 				'log_type' => 'user',
 				'extra' => array(
-					'previous' => !empty($user_profile[$memID]['options'][$row['col_name']]) ? $user_profile[$memID]['options'][$row['col_name']] : '',
+					'previous' => !empty($user_profile[$memID]['options'][$row['col_name']])
+						? $user_profile[$memID]['options'][$row['col_name']]
+						: '',
 					'new' => $value,
-					'applicator' => $user_info['id'],
+					// The applicator is the same as the member affected
+					// if we are registering a new member.
+					'applicator' => empty($user_info['id']) && $area == 'register'
+						? $memID
+						: $user_info['id'],
 					'member_affected' => $memID,
 				),
 			);
@@ -2031,7 +2037,7 @@ function alert_configuration($memID, $defaultSettings = false)
 	$group_options = array(
 		'board' => array(
 			array('check', 'msg_auto_notify', 'label' => 'after'),
-			array('check', 'msg_receive_body', 'label' => 'after'),
+			array(empty($modSettings['disallow_sendBody']) ? 'check' : 'hide', 'msg_receive_body', 'label' => 'after'),
 			array('select', 'msg_notify_pref', 'label' => 'before', 'opts' => array(
 				0 => $txt['alert_opt_msg_notify_pref_never'],
 				1 => $txt['alert_opt_msg_notify_pref_instant'],
@@ -3206,7 +3212,7 @@ function profileLoadAvatarData()
 		'allow_server_stored' => (empty($modSettings['gravatarEnabled']) || empty($modSettings['gravatarOverride'])) && (allowedTo('profile_server_avatar') || (!$context['user']['is_owner'] && allowedTo('profile_extra_any'))),
 		'allow_upload' => (empty($modSettings['gravatarEnabled']) || empty($modSettings['gravatarOverride'])) && (allowedTo('profile_upload_avatar') || (!$context['user']['is_owner'] && allowedTo('profile_extra_any'))),
 		'allow_external' => (empty($modSettings['gravatarEnabled']) || empty($modSettings['gravatarOverride'])) && (allowedTo('profile_remote_avatar') || (!$context['user']['is_owner'] && allowedTo('profile_extra_any'))),
-		'allow_gravatar' => !empty($modSettings['gravatarEnabled']) || !empty($modSettings['gravatarOverride']),
+		'allow_gravatar' => !empty($modSettings['gravatarEnabled']),
 	);
 
 	if ($context['member']['avatar']['allow_gravatar'] && (stristr($cur_profile['avatar'], 'gravatar://') || !empty($modSettings['gravatarOverride'])))
@@ -3214,7 +3220,7 @@ function profileLoadAvatarData()
 		$context['member']['avatar'] += array(
 			'choice' => 'gravatar',
 			'server_pic' => 'blank.png',
-			'external' => $cur_profile['avatar'] == 'gravatar://' || empty($modSettings['gravatarAllowExtraEmail']) || !empty($modSettings['gravatarOverride']) ? $cur_profile['email_address'] : substr($cur_profile['avatar'], 11)
+			'external' => $cur_profile['avatar'] == 'gravatar://' || empty($modSettings['gravatarAllowExtraEmail']) || (!empty($modSettings['gravatarOverride']) && substr($cur_profile['avatar'], 0, 11) != 'gravatar://') ? $cur_profile['email_address'] : substr($cur_profile['avatar'], 11)
 		);
 		$context['member']['avatar']['href'] = get_gravatar_url($context['member']['avatar']['external']);
 	}

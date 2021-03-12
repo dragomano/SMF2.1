@@ -7,7 +7,7 @@
  *
  * @package SMF
  * @author Simple Machines https://www.simplemachines.org
- * @copyright 2020 Simple Machines and individual contributors
+ * @copyright 2021 Simple Machines and individual contributors
  * @license https://www.simplemachines.org/about/smf/license.php BSD
  *
  * @version 2.1 RC3
@@ -66,7 +66,10 @@ function getServerVersions($checkFor)
 	{
 		db_extend();
 		if (!isset($db_connection) || $db_connection === false)
-			trigger_error('getServerVersions(): you need to be connected to the database in order to get its server version', E_USER_NOTICE);
+		{
+			loadLanguage('Errors');
+			trigger_error($txt['get_server_versions_no_database'], E_USER_NOTICE);
+		}
 		else
 		{
 			$versions['db_engine'] = array(

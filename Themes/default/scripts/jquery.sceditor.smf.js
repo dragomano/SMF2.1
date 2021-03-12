@@ -3,7 +3,7 @@
  *
  * @package SMF
  * @author Simple Machines https://www.simplemachines.org
- * @copyright 2020 Simple Machines and individual contributors
+ * @copyright 2021 Simple Machines and individual contributors
  * @license https://www.simplemachines.org/about/smf/license.php BSD
  *
  * @version 2.1 RC3
@@ -202,29 +202,7 @@ sceditor.command.set(
 	}
 );
 sceditor.command.set(
-	'email', {
-		txtExec: function (caller, selected) {
-			var	display = selected && selected.indexOf('@') > -1 ? null : selected,
-				email = prompt(this._("Enter the e-mail address:"), (display ? '' : selected));
-			if (email)
-			{
-				var text = prompt(this._("Enter the displayed text:"), display || email) || email;
-				this.insertText("[email=" + email + "]" + text + "[/email]");
-			}
-		}
-	}
-);
-sceditor.command.set(
 	'link', {
-		txtExec: function (caller, selected) {
-			var	display = selected && selected.indexOf('http://') > -1 ? null : selected,
-				url = prompt(this._("Enter URL:"), (display ? 'http://' : selected));
-			if (url)
-			{
-				var text = prompt(this._("Enter the displayed text:"), display || url) || url;
-				this.insertText("[url=\"" + url + "\"]" + text + "[/url]");
-			}
-		},
 		exec: function (caller) {
 			var editor = this;
 
@@ -239,13 +217,16 @@ sceditor.command.set(
 					text = text || url;
 
 					editor.wysiwygEditorInsertHtml(
-						'<a target="_blank" rel="noopener" href="' + url + '">' + text + '</a>'
+						'<a target="_blank" rel="noopener" href="' +
+						sceditor.escapeEntities(url) + '">' +
+						sceditor.escapeEntities(text, true) + '</a>'
 					);
 				} else {
 					// Can't just use `editor.execCommand('createlink', url)`
 					// because we need to set the target attribute.
 					editor.wysiwygEditorInsertHtml(
-						'<a target="_blank" rel="noopener" href="' + url + '">', '</a>'
+						'<a target="_blank" rel="noopener" href="' +
+						sceditor.escapeEntities(url) + '">', '</a>'
 					);
 				}
 			});
@@ -257,15 +238,11 @@ sceditor.command.set(
 	'bulletlist', {
 		txtExec: function (caller, selected) {
 			if (selected)
-			{
-				var content = '';
-
-				$.each(selected.split(/\r?\n/), function () {
-					content += (content ? '\n' : '') + '[li]' + this + '[/li]';
-				});
-
-				this.insertText('[list]\n' + content + '\n[/list]');
-			}
+				this.insertText(
+					'[list]\n[li]' +
+					selected.split(/\r?\n/).join('[/li]\n[li]') +
+					'[/li]\n[/list]'
+				);
 			else
 				this.insertText('[list]\n[li]', '[/li]\n[li][/li]\n[/list]');
 		}
@@ -276,15 +253,11 @@ sceditor.command.set(
 	'orderedlist', {
 		txtExec: function (caller, selected) {
 			if (selected)
-			{
-				var content = '';
-
-				$.each(selected.split(/\r?\n/), function () {
-					content += (content ? '\n' : '') + '[li]' + this + '[/li]';
-				});
-
-				this.insertText('[list type=decimal]\n' + content + '\n[/list]');
-			}
+				this.insertText(
+					'[list type=decimal]\n[li]' +
+					selected.split(/\r?\n/).join('[/li]\n[li]') +
+					'[/li]\n[/list]'
+				);
 			else
 				this.insertText('[list type=decimal]\n[li]', '[/li]\n[li][/li]\n[/list]');
 		}
@@ -333,8 +306,66 @@ sceditor.command.set(
 			var editor = this;
 
 			editor.commands.youtube._dropDown(editor, caller, function (id, time) {
-				editor.wysiwygEditorInsertHtml('<div class="videocontainer"><div><iframe frameborder="0" allowfullscreen src="https://www.youtube.com/embed/' + id + '?wmode=opaque&start=' + time + '" data-youtube-id="' + id + '" loading="lazy"></iframe></div></div>');
+				editor.wysiwygEditorInsertHtml('<div class="videocontainer"><div><iframe frameborder="0" allowfullscreen src="https://www.youtube-nocookie.com/embed/' + id + '?wmode=opaque&start=' + time + '" data-youtube-id="' + id + '" loading="lazy"></iframe></div></div>');
 			});
+		}
+	}
+);
+
+sceditor.command.set(
+	'email', {
+		exec: function (caller)
+		{
+			var editor = this;
+
+			editor.commands.email._dropDown(
+				editor,
+				caller,
+				function (email, text)
+				{
+					// needed for IE to reset the last range
+					editor.focus();
+
+					if (!editor.getRangeHelper().selectedHtml() || text)
+						editor.wysiwygEditorInsertHtml(
+							'<a href="' +
+							'mailto:' + sceditor.escapeEntities(email) + '">' +
+								sceditor.escapeEntities(text || email) +
+							'</a>'
+						);
+					else
+						editor.execCommand('createlink', 'mailto:' + email);
+				}
+			);
+		},
+	}
+);
+
+sceditor.command.set(
+	'image', {
+		exec: function (caller)
+		{
+			var editor = this;
+
+			editor.commands.image._dropDown(
+				editor,
+				caller,
+				'',
+				function (url, width, height)
+				{
+					var attrs = ['src="' + sceditor.escapeEntities(url) + '"'];
+
+					if (width)
+						attrs.push('width="' + sceditor.escapeEntities(width, true) + '"');
+
+					if (height)
+						attrs.push('height="' + sceditor.escapeEntities(height, true) + '"');
+ 
+					editor.wysiwygEditorInsertHtml(
+						'<img ' + attrs.join(' ') + '>'
+					);
+				}
+			);
 		}
 	}
 );
@@ -792,34 +823,18 @@ sceditor.formats.bbcode.set(
 			if ($(element).hasClass('php'))
 				return '[php]' + content.replace('&#91;', '[') + '[/php]';
 
-			var from = '';
-			if ($(element).children("cite:first").length === 1)
-			{
-				from = $(element).children("cite:first").text();
-
-				$(element).attr({'from': from.php_htmlspecialchars()});
-
-				from = '=' + from;
-				content = '';
-				$(element).children("cite:first").remove();
-				content = this.elementToBbcode($(element));
-			}
-			else
-			{
-				if (typeof $(element).attr('from') != 'undefined')
-				{
-					from = '=' + $(element).attr('from').php_unhtmlspecialchars();
-				}
-			}
+			var
+				dom = sceditor.dom,
+				attr = dom.attr,
+				title = attr(element, 'data-title'),
+				from = title ?' =' + title : '';
 
 			return '[code' + from + ']' + content.replace('&#91;', '[') + '[/code]';
 		},
 		html: function (element, attrs, content) {
-			var from = '';
-			if (typeof attrs.defaultattr !== "undefined")
-				from = '<cite>' + attrs.defaultattr + '</cite>';
+			var from = attrs.defaultattr ? ' data-title="' + attrs.defaultattr + '"'  : '';
 
-			return '<code>' + from + content.replace('[', '&#91;') + '</code>'
+			return '<code data-name="' + this.opts.txtVars.code + '"' + from + '>' + content.replace('[', '&#91;') + '</code>'
 		}
 	}
 );
@@ -890,8 +905,14 @@ sceditor.formats.bbcode.set(
 				author += ' ' + bbc_search_on;
 
 			/*
-			 * This fixes GH Bug #2845
-			 * As SMF allows "[quote=text]message[/quote]" it is lost during sceditor when it converts bbc to html and then html back to bbc code.  The simplest method is to tell sceditor that this is a "author", which is how the bbc parser treats it in SMF.  This will cause all bbc to be updated to "[quote author=text]message[/quote]".
+			 * This fixes #2845
+			 *
+			 * As SMF allows "[quote=text]message[/quote]" it is lost during
+			 * sceditor when it converts bbc to html and then html back to
+			 * bbc code. The simplest method is to tell sceditor that this
+			 * is a "author", which is how the bbc parser treats it in SMF.
+			 *
+			 * This will cause all bbc to be updated to "[quote author=text]message[/quote]".
 			*/
 			if (attr_author == '' && attrs.defaultattr)
 				attr_author = attrs.defaultattr;
@@ -986,6 +1007,6 @@ sceditor.formats.bbcode.set(
 			else
 				return content;
 		},
-		html: '<div class="videocontainer"><div><iframe frameborder="0" src="https://www.youtube.com/embed/{0}?wmode=opaque" data-youtube-id="{0}" loading="lazy" allowfullscreen></iframe></div></div>'
+		html: '<div class="videocontainer"><div><iframe frameborder="0" src="https://www.youtube-nocookie.com/embed/{0}?wmode=opaque" data-youtube-id="{0}" loading="lazy" allowfullscreen></iframe></div></div>'
 	}
 );

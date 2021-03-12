@@ -4,7 +4,7 @@
  *
  * @package SMF
  * @author Simple Machines https://www.simplemachines.org
- * @copyright 2020 Simple Machines and individual contributors
+ * @copyright 2021 Simple Machines and individual contributors
  * @license https://www.simplemachines.org/about/smf/license.php BSD
  *
  * @version 2.1 RC3
@@ -2701,7 +2701,7 @@ function template_error_message()
 		{
 			$text_key_error = $error == 'password_short' ?
 				sprintf($txt['profile_error_' . $error], (empty($modSettings['password_strength']) ? 4 : 8)) :
-				$txt['profile_error_' . $error];
+				(isset($txt['profile_error_' . $error]) ? $txt['profile_error_' . $error] : '');
 
 			echo '
 				<li>', isset($txt['profile_error_' . $error]) ? $text_key_error : $error, '</li>';
@@ -2854,7 +2854,7 @@ function template_profile_signature_modify()
  */
 function template_profile_avatar_select()
 {
-	global $context, $txt, $modSettings;
+	global $context, $txt, $modSettings, $scripturl;
 
 	// Start with the upper menu
 	echo '
@@ -2863,7 +2863,7 @@ function template_profile_avatar_select()
 									<label for="avatar_upload_box">', $txt['personal_picture'], '</label>
 								</strong>';
 
-	if (empty($modSettings['gravatarOverride']))
+	if (empty($modSettings['gravatarEnabled']) || empty($modSettings['gravatarOverride']))
 		echo '
 								<input type="radio" onclick="swap_avatar(this); return true;" name="avatar_choice" id="avatar_choice_none" value="none"' . ($context['member']['avatar']['choice'] == 'none' ? ' checked="checked"' : '') . '>
 								<label for="avatar_choice_none"' . (isset($context['modify_error']['bad_avatar']) ? ' class="error"' : '') . '>
@@ -2894,7 +2894,8 @@ function template_profile_avatar_select()
 	if (!empty($context['member']['avatar']['allow_gravatar']))
 		echo '
 								<input type="radio" onclick="swap_avatar(this); return true;" name="avatar_choice" id="avatar_choice_gravatar" value="gravatar"' . ($context['member']['avatar']['choice'] == 'gravatar' ? ' checked="checked"' : '') . '>
-								<label for="avatar_choice_gravatar"' . (isset($context['modify_error']['bad_avatar']) ? ' class="error"' : '') . '>' . $txt['use_gravatar'] . '</label>';
+								<label for="avatar_choice_gravatar"' . (isset($context['modify_error']['bad_avatar']) ? ' class="error"' : '') . '>' . $txt['use_gravatar'] . '</label>
+								<span class="smalltext"><a href="', $scripturl, '?action=helpadmin;help=gravatar" onclick="return reqOverlayDiv(this.href);"><span class="main_icons help"></span></a></span>';
 
 	echo '
 							</dt>

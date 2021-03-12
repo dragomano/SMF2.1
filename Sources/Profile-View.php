@@ -5,7 +5,7 @@
  *
  * @package SMF
  * @author Simple Machines https://www.simplemachines.org
- * @copyright 2020 Simple Machines and individual contributors
+ * @copyright 2021 Simple Machines and individual contributors
  * @license https://www.simplemachines.org/about/smf/license.php BSD
  *
  * @version 2.1 RC3
@@ -33,8 +33,9 @@ function summary($memID)
 		'can_send_pm' => allowedTo('pm_send'),
 		'can_have_buddy' => allowedTo('profile_extra_own') && !empty($modSettings['enable_buddylist']),
 		'can_issue_warning' => allowedTo('issue_warning') && $modSettings['warning_settings'][0] == 1,
-		'can_view_warning' => (allowedTo('moderate_forum') || allowedTo('issue_warning') || allowedTo('view_warning_any') || ($context['user']['is_owner'] && allowedTo('view_warning_own')) && $modSettings['warning_settings'][0] === 1)
+		'can_view_warning' => (allowedTo('moderate_forum') || allowedTo('issue_warning') || allowedTo('view_warning_any') || ($context['user']['is_owner'] && allowedTo('view_warning_own'))) && $modSettings['warning_settings'][0] === '1'
 	);
+
 	$context['member'] = &$memberContext[$memID];
 
 	// Set a canonical URL for this page.
@@ -1245,11 +1246,12 @@ function showAttachments($memID)
 				),
 				'data' => array(
 					'sprintf' => array(
-						'format' => '<a href="' . $scripturl . '?action=dlattach;topic=%1$d.0;attach=%2$d">%3$s</a>',
+						'format' => '<a href="' . $scripturl . '?action=dlattach;topic=%1$d.0;attach=%2$d">%3$s</a>%4$s',
 						'params' => array(
 							'topic' => true,
 							'id' => true,
 							'filename' => false,
+							'awaiting_approval' => false,
 						),
 					),
 				),
@@ -1325,7 +1327,7 @@ function showAttachments($memID)
  */
 function list_getAttachments($start, $items_per_page, $sort, $boardsAllowed, $memID)
 {
-	global $smcFunc, $board, $modSettings, $context;
+	global $smcFunc, $board, $modSettings, $context, $txt;
 
 	// Retrieve some attachments.
 	$request = $smcFunc['db_query']('', '
@@ -1338,8 +1340,8 @@ function list_getAttachments($start, $items_per_page, $sort, $boardsAllowed, $me
 			AND a.id_msg != {int:no_message}
 			AND m.id_member = {int:current_member}' . (!empty($board) ? '
 			AND b.id_board = {int:board}' : '') . (!in_array(0, $boardsAllowed) ? '
-			AND b.id_board IN ({array_int:boards_list})' : '') . (!$modSettings['postmod_active'] || $context['user']['is_owner'] ? '' : '
-			AND m.approved = {int:is_approved}') . '
+			AND b.id_board IN ({array_int:boards_list})' : '') . (!$modSettings['postmod_active'] || allowedTo('approve_posts') || $context['user']['is_owner'] ? '' : '
+			AND a.approved = {int:is_approved}') . '
 		ORDER BY {raw:sort}
 		LIMIT {int:offset}, {int:limit}',
 		array(
@@ -1367,6 +1369,7 @@ function list_getAttachments($start, $items_per_page, $sort, $boardsAllowed, $me
 			'board' => $row['id_board'],
 			'board_name' => $row['name'],
 			'approved' => $row['approved'],
+			'awaiting_approval' => (empty($row['approved']) ? ' <em>(' . $txt['awaiting_approval'] . ')</em>' : ''),
 		);
 
 	$smcFunc['db_free_result']($request);
@@ -3064,7 +3067,7 @@ function list_getGroupRequests($start, $items_per_page, $sort, $memID)
  */
 function showPermissions($memID)
 {
-	global $txt, $board;
+	global $txt, $board, $modSettings;
 	global $user_profile, $context, $sourcedir, $smcFunc;
 
 	// Verify if the user has sufficient permissions.
@@ -3109,7 +3112,8 @@ function showPermissions($memID)
 	$context['no_access_boards'] = array();
 	while ($row = $smcFunc['db_fetch_assoc']($request))
 	{
-		if (count(array_intersect($curGroups, explode(',', $row['member_groups']))) === 0 && !$row['is_mod'])
+		if ((count(array_intersect($curGroups, explode(',', $row['member_groups']))) === 0) && !$row['is_mod']
+		&& (!empty($modSettings['board_manager_groups']) && count(array_intersect($curGroups, explode(',', $modSettings['board_manager_groups']))) === 0))
 			$context['no_access_boards'][] = array(
 				'id' => $row['id_board'],
 				'name' => $row['name'],

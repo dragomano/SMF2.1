@@ -7,7 +7,7 @@
  *
  * @package SMF
  * @author Simple Machines https://www.simplemachines.org
- * @copyright 2020 Simple Machines and individual contributors
+ * @copyright 2021 Simple Machines and individual contributors
  * @license https://www.simplemachines.org/about/smf/license.php BSD
  *
  * @version 2.1 RC3
@@ -43,7 +43,7 @@ if (!defined('SMF'))
  */
 function updateStats($type, $parameter1 = null, $parameter2 = null)
 {
-	global $modSettings, $smcFunc;
+	global $modSettings, $smcFunc, $txt;
 
 	switch ($type)
 	{
@@ -242,7 +242,8 @@ function updateStats($type, $parameter1 = null, $parameter2 = null)
 			break;
 
 		default:
-			trigger_error('updateStats(): Invalid statistic type \'' . $type . '\'', E_USER_NOTICE);
+			loadLanguage('Errors');
+			trigger_error(sprintf($txt['invalid_statistic_type'], $type), E_USER_NOTICE);
 	}
 }
 
@@ -1434,27 +1435,17 @@ function parse_bbc($message, $smileys = true, $cache_id = '', $parse_tags = arra
 						$alt = ' alt="' . (!empty($params['{alt}']) ? $params['{alt}'] : $currentAttachment['name']) . '"';
 						$title = !empty($data) ? ' title="' . $smcFunc['htmlspecialchars']($data) . '"' : '';
 
-						if (empty($params['{width}']) && empty($params['{height}']))
-						{
-							$width = !empty($currentAttachment['width']) ? $currentAttachment['width'] : '';
-							$height = !empty($currentAttachment['height']) ? $currentAttachment['height'] : '';
-						}
-						else
-						{
-							$width = !empty($params['{width}']) ? $params['{width}'] : '';
-							$height = !empty($params['{height}']) ? $params['{height}'] : '';
-						}
-
 						// Image.
 						if (!empty($currentAttachment['is_image']))
 						{
-							$width = !empty($width) ? ' width="' . $width . '"' : '';
-							$height = !empty($height) ? ' height="' . $height . '"' : '';
-
-							if ($currentAttachment['thumbnail']['has_thumb'] && empty($params['{width}']) && empty($params['{height}']))
-								$returnContext .= '<a href="' . $currentAttachment['href'] . ';image" id="link_' . $currentAttachment['id'] . '" onclick="' . $currentAttachment['thumbnail']['javascript'] . '"><img src="' . $currentAttachment['thumbnail']['href'] . '"' . $alt . $title . ' id="thumb_' . $currentAttachment['id'] . '" class="atc_img"></a>';
+							if (empty($params['{width}']) && empty($params['{height}']))
+								$returnContext .= '<img src="' . $currentAttachment['href'] . '"' . $alt . $title . ' class="bbc_img"></a>';
 							else
-								$returnContext .= '<img src="' . $currentAttachment['href'] . ';image"' . $alt . $title . $width . $height . ' class="bbc_img"/>';
+							{
+								$width = !empty($params['{width}']) ? ' width="' . $params['{width}'] . '"': '';
+								$height = !empty($params['{height}']) ? 'height="' . $params['{height}'] . '"' : '';
+								$returnContext .= '<img src="' . $currentAttachment['href'] . ';image"' . $alt . $title . $width . $height . ' class="bbc_img resized"/>';
+							}
 						}
 						// Video.
 						elseif (strpos($currentAttachment['mime_type'], 'video/') === 0)
@@ -1739,10 +1730,8 @@ function parse_bbc($message, $smileys = true, $cache_id = '', $parse_tags = arra
 				'parameters' => array(
 					'alt' => array('optional' => true),
 					'title' => array('optional' => true),
-					'width' => array('optional' => true, 'value' => ' width="$1"', 'match' => '(\d+)'),
-					'height' => array('optional' => true, 'value' => ' height="$1"', 'match' => '(\d+)'),
 				),
-				'content' => '<img src="$1" alt="{alt}" title="{title}"{width}{height} class="bbc_img resized">',
+				'content' => '<img src="$1" alt="{alt}" title="{title}" class="bbc_img" loading="lazy">',
 				'validate' => function(&$tag, &$data, $disabled)
 				{
 					$data = strtr($data, array('<br>' => ''));
@@ -1757,7 +1746,13 @@ function parse_bbc($message, $smileys = true, $cache_id = '', $parse_tags = arra
 			array(
 				'tag' => 'img',
 				'type' => 'unparsed_content',
-				'content' => '<img src="$1" alt="" class="bbc_img">',
+				'parameters' => array(
+					'alt' => array('optional' => true),
+					'title' => array('optional' => true),
+					'width' => array('optional' => true, 'value' => ' width="$1"', 'match' => '(\d+)'),
+					'height' => array('optional' => true, 'value' => ' height="$1"', 'match' => '(\d+)'),
+				),
+				'content' => '<img src="$1" alt="{alt}" title="{title}"{width}{height} class="bbc_img resized" loading="lazy">',
 				'validate' => function(&$tag, &$data, $disabled)
 				{
 					$data = strtr($data, array('<br>' => ''));
@@ -3657,7 +3652,7 @@ function setupThemeContext($forceload = false)
 		$context['user']['avatar'] = array();
 
 		// Check for gravatar first since we might be forcing them...
-		if (($modSettings['gravatarEnabled'] && substr($user_info['avatar']['url'], 0, 11) == 'gravatar://') || !empty($modSettings['gravatarOverride']))
+		if (!empty($modSettings['gravatarEnabled']) && (substr($user_info['avatar']['url'], 0, 11) == 'gravatar://' || !empty($modSettings['gravatarOverride'])))
 		{
 			if (!empty($modSettings['gravatarAllowExtraEmail']) && stristr($user_info['avatar']['url'], 'gravatar://') && strlen($user_info['avatar']['url']) > 11)
 				$context['user']['avatar']['href'] = get_gravatar_url($smcFunc['substr']($user_info['avatar']['url'], 11));
@@ -3856,7 +3851,7 @@ function memoryReturnBytes($val)
  */
 function template_header()
 {
-	global $txt, $modSettings, $context, $user_info, $boarddir, $cachedir, $cache_enable;
+	global $txt, $modSettings, $context, $user_info, $boarddir, $cachedir, $cache_enable, $language;
 
 	setupThemeContext();
 
@@ -3922,11 +3917,19 @@ function template_header()
 			secureDirectory($path, true);
 			secureDirectory($cachedir);
 
-			// If agreement is enabled, at least the english version shall exists
-			if ($modSettings['requireAgreement'])
+			// If agreement is enabled, at least the english version shall exist
+			if (!empty($modSettings['requireAgreement']))
 				$agreement = !file_exists($boarddir . '/agreement.txt');
 
-			if (!empty($securityFiles) || (!empty($cache_enable) && !is_writable($cachedir)) || !empty($agreement) || !empty($context['auth_secret_missing']))
+			// If privacy policy is enabled, at least the default language version shall exist
+			if (!empty($modSettings['requirePolicyAgreement']))
+				$policy_agreement = empty($modSettings['policy_' . $language]);
+
+			if (!empty($securityFiles) ||
+				(!empty($cache_enable) && !is_writable($cachedir)) ||
+				!empty($agreement) ||
+				!empty($policy_agreement) ||
+				!empty($context['auth_secret_missing']))
 			{
 				echo '
 		<div class="errorbox">
@@ -3951,6 +3954,10 @@ function template_header()
 				if (!empty($agreement))
 					echo '
 				<strong>', $txt['agreement_missing'], '</strong><br>';
+
+				if (!empty($policy_agreement))
+					echo '
+				<strong>', $txt['policy_agreement_missing'], '</strong><br>';
 
 				if (!empty($context['auth_secret_missing']))
 					echo '
@@ -5400,7 +5407,7 @@ function load_file($string)
  */
 function fetch_web_data($url, $post_data = '', $keep_alive = false, $redirection_level = 0)
 {
-	global $webmaster_email, $sourcedir;
+	global $webmaster_email, $sourcedir, $txt;
 	static $keep_alive_dom = null, $keep_alive_fp = null;
 
 	preg_match('~^(http|ftp)(s)?://([^/:]+)(:(\d+))?(.+)$~', $url, $match);
@@ -5563,7 +5570,8 @@ function fetch_web_data($url, $post_data = '', $keep_alive = false, $redirection
 	else
 	{
 		// Umm, this shouldn't happen?
-		trigger_error('fetch_web_data(): Bad URL', E_USER_NOTICE);
+		loadLanguage('Errors');
+		trigger_error($txt['fetch_web_data_bad_url'], E_USER_NOTICE);
 		$data = false;
 	}
 

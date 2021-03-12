@@ -9,7 +9,7 @@
  *
  * @package SMF
  * @author Simple Machines https://www.simplemachines.org
- * @copyright 2020 Simple Machines and individual contributors
+ * @copyright 2021 Simple Machines and individual contributors
  * @license https://www.simplemachines.org/about/smf/license.php BSD
  *
  * @version 2.1 RC3
@@ -592,7 +592,7 @@ function sendmail($to, $subject, $message, $from = null, $message_id = null, $se
 	list (, $subject) = mimespecialchars($subject, true, $hotmail_fix, $line_break);
 
 	// Construct the mail headers...
-	$headers = 'From: ' . $from_name . ' <' . (empty($modSettings['mail_from']) ? $webmaster_email : $modSettings['mail_from']) . '>' . $line_break;
+	$headers = 'From: "' . $from_name . '" <' . (empty($modSettings['mail_from']) ? $webmaster_email : $modSettings['mail_from']) . '>' . $line_break;
 	$headers .= $from !== null ? 'Reply-To: <' . $from . '>' . $line_break : '';
 	$headers .= 'Return-Path: ' . (empty($modSettings['mail_from']) ? $webmaster_email : $modSettings['mail_from']) . $line_break;
 	$headers .= 'Date: ' . gmdate('D, d M Y H:i:s') . ' -0000' . $line_break;
@@ -1778,7 +1778,8 @@ function createPost(&$msgOptions, &$topicOptions, &$posterOptions)
 			// Couldn't find the current poster?
 			if ($smcFunc['db_num_rows']($request) == 0)
 			{
-				trigger_error('createPost(): Invalid member id ' . $posterOptions['id'], E_USER_NOTICE);
+				loadLanguage('Errors');
+				trigger_error(sprintf($txt['create_post_invalid_member_id'], $posterOptions['id']), E_USER_NOTICE);
 				$posterOptions['id'] = 0;
 				$posterOptions['name'] = $txt['guest_title'];
 				$posterOptions['email'] = '';
@@ -2953,7 +2954,7 @@ function spell_init()
 		pspell_new('en');
 
 		// Next, the dictionary in question may not exist. So, we try it... but...
-		$pspell_link = pspell_new($txt['lang_dictionary'], $txt['lang_spelling'], '', strtr($context['character_set'], array('iso-' => 'iso', 'ISO-' => 'iso')), PSPELL_FAST | PSPELL_RUN_TOGETHER);
+		$pspell_link = pspell_new($txt['lang_dictionary'], '', '', strtr($context['character_set'], array('iso-' => 'iso', 'ISO-' => 'iso')), PSPELL_FAST | PSPELL_RUN_TOGETHER);
 
 		// Most people don't have anything but English installed... So we use English as a last resort.
 		if (!$pspell_link)

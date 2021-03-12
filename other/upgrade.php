@@ -5,7 +5,7 @@
  *
  * @package SMF
  * @author Simple Machines https://www.simplemachines.org
- * @copyright 2020 Simple Machines and individual contributors
+ * @copyright 2021 Simple Machines and individual contributors
  * @license https://www.simplemachines.org/about/smf/license.php BSD
  *
  * @version 2.1 RC3
@@ -14,7 +14,7 @@
 // Version information...
 define('SMF_VERSION', '2.1 RC3');
 define('SMF_FULL_VERSION', 'SMF ' . SMF_VERSION);
-define('SMF_SOFTWARE_YEAR', '2020');
+define('SMF_SOFTWARE_YEAR', '2021');
 define('SMF_LANG_VERSION', '2.1 RC3');
 define('SMF_INSTALLING', 1);
 
@@ -30,7 +30,7 @@ if (!defined('TIME_START'))
  *
  * @var string
  */
-$GLOBALS['required_php_version'] = '5.4.0';
+$GLOBALS['required_php_version'] = '5.6.0';
 
 /**
  * A list of supported database systems.
@@ -846,7 +846,7 @@ function initialize_inputs()
 		deleteFile($upgrade_path . '/Sources/DumpDatabase.php');
 		deleteFile($upgrade_path . '/Sources/LockTopic.php');
 
-		header('location: http://' . (isset($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : $_SERVER['SERVER_NAME'] . ':' . $_SERVER['SERVER_PORT']) . dirname($_SERVER['PHP_SELF']) . '/Themes/default/images/blank.png');
+		header('location: http' . (httpsOn() ? 's' : '') . '://' . (isset($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : $_SERVER['SERVER_NAME'] . ':' . $_SERVER['SERVER_PORT']) . dirname($_SERVER['PHP_SELF']) . '/Themes/default/images/blank.png');
 		exit;
 	}
 
@@ -1234,6 +1234,9 @@ function UpgradeOptions()
 	if (empty($_POST['upcont']))
 		return false;
 
+	// We cannot execute this step in strict mode - strict mode data fixes are not applied yet
+	setSqlMode(false);
+
 	// Firstly, if they're enabling SM stat collection just do it.
 	if (!empty($_POST['stats']) && substr($boardurl, 0, 16) != 'http://localhost' && empty($modSettings['allow_sm_stats']) && empty($modSettings['enable_sm_stats']))
 	{
@@ -1243,7 +1246,9 @@ function UpgradeOptions()
 		if (empty($modSettings['sm_stats_key']))
 		{
 			// Attempt to register the site etc.
-			$fp = @fsockopen('www.simplemachines.org', 80, $errno, $errstr);
+			$fp = @fsockopen('www.simplemachines.org', 443, $errno, $errstr);
+			if (!$fp)
+				$fp = @fsockopen('www.simplemachines.org', 80, $errno, $errstr);
 			if ($fp)
 			{
 				$out = 'GET /smf/stats/register_stats.php?site=' . base64_encode($boardurl) . ' HTTP/1.1' . "\r\n";
@@ -1357,7 +1362,7 @@ function UpgradeOptions()
 	// If $boardurl reflects https, set force_ssl
 	if (!function_exists('cache_put_data'))
 		require_once($sourcedir . '/Load.php');
-	if (stripos($boardurl, 'https://') !== false)
+	if (stripos($boardurl, 'https://') !== false && !isset($modSettings['force_ssl']))
 		updateSettings(array('force_ssl' => '1'));
 
 	// If we're overriding the language follow it through.
@@ -5005,7 +5010,7 @@ function template_upgrade_complete()
 
 	echo '
 					<p>
-						', sprintf($txt['upgrade_problems'], 'http://simplemachines.org'), '
+						', sprintf($txt['upgrade_problems'], 'https://www.simplemachines.org'), '
 						<br>
 						', $txt['upgrade_luck'], '<br>
 						Simple Machines
